@@ -21,7 +21,6 @@ return i+1;
 int partition_rand(int arr[],int l,int h)
 {
    int random1= l + rand()% (h-l);
-//cout<<random1<<" ";
    swap(arr[random1],arr[h]);
 
    int p = partition_pivot(arr,l,h);

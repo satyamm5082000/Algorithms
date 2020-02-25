@@ -18,9 +18,7 @@ void search_pattern(string a,string b)
             cout<<"pattern found from "<<i<<" to "<<i+y<<"."<<endl;
         }
     }
-
 }
-
 int main()
 {
     string s,s1;

@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-void counting_ps(string x,int p, int *arr)
+void counting_ps(string x,int p, int arr[])
 {
     int j=0;
     arr[0]= 0;
@@ -54,7 +54,6 @@ void search_pattern_kmp(string a,string b)
             j=arr[j-1];
             else 
             i++;
-
         }
     }
 }

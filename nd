@@ -1,0 +1,458 @@
+// Java program to implement Round Robin 
+// Scheduling with different arrival time 
+class roundrobin { 
+	public static void roundRobin(String p[], int a[], 
+								int b[], int n) 
+	{ 
+		// result of average times 
+		int res = 0; 
+		int resc = 0; 
+
+		// for sequence storage 
+		String seq = new String(); 
+
+		// copy the burst array and arrival array 
+		// for not effecting the actual array 
+		int res_b[] = new int[b.length]; 
+		int res_a[] = new int[a.length]; 
+
+		for (int i = 0; i < res_b.length; i++) { 
+			res_b[i] = b[i]; 
+			res_a[i] = a[i]; 
+		} 
+
+		// critical time of system 
+		int t = 0; 
+
+		// for store the waiting time 
+		int w[] = new int[p.length]; 
+
+		// for store the Completion time 
+		int comp[] = new int[p.length]; 
+
+		while (true) { 
+			boolean flag = true; 
+			for (int i = 0; i < p.length; i++) { 
+
+				// these condition for if 
+				// arrival is not on zero 
+
+				// check that if there come before qtime 
+				if (res_a[i] <= t) { 
+					if (res_a[i] <= n) { 
+						if (res_b[i] > 0) { 
+							flag = false; 
+							if (res_b[i] > n) { 
+
+								// make decrease the b time 
+								t = t + n; 
+								res_b[i] = res_b[i] - n; 
+								res_a[i] = res_a[i] + n; 
+								seq += "->" + p[i]; 
+							} 
+							else { 
+
+								// for last time 
+								t = t + res_b[i]; 
+
+								// store comp time 
+								comp[i] = t - a[i]; 
+
+								// store wait time 
+								w[i] = t - b[i] - a[i]; 
+								res_b[i] = 0; 
+
+								// add sequence 
+								seq += "->" + p[i]; 
+							} 
+						} 
+					} 
+					else if (res_a[i] > n) { 
+
+						// is any have less arrival time 
+						// the coming process then execute them 
+						for (int j = 0; j < p.length; j++) { 
+
+							// compare 
+							if (res_a[j] < res_a[i]) { 
+								if (res_b[j] > 0) { 
+									flag = false; 
+									if (res_b[j] > n) { 
+										t = t + n; 
+										res_b[j] = res_b[j] - n; 
+										res_a[j] = res_a[j] + n; 
+										seq += "->" + p[j]; 
+									} 
+									else { 
+										t = t + res_b[j]; 
+										comp[j] = t - a[j]; 
+										w[j] = t - b[j] - a[j]; 
+										res_b[j] = 0; 
+										seq += "->" + p[j]; 
+									} 
+								} 
+							} 
+						} 
+
+						// now the previous porcess according to 
+						// ith is process 
+						if (res_b[i] > 0) { 
+							flag = false; 
+
+							// Check for greaters 
+							if (res_b[i] > n) { 
+								t = t + n; 
+								res_b[i] = res_b[i] - n; 
+								res_a[i] = res_a[i] + n; 
+								seq += "->" + p[i]; 
+							} 
+							else { 
+								t = t + res_b[i]; 
+								comp[i] = t - a[i]; 
+								w[i] = t - b[i] - a[i]; 
+								res_b[i] = 0; 
+								seq += "->" + p[i]; 
+							} 
+						} 
+					} 
+				} 
+
+				// if no process is come on thse critical 
+				else if (res_a[i] > t) { 
+					t++; 
+					i--; 
+				} 
+			} 
+			// for exit the while loop 
+			if (flag) { 
+				break; 
+			} 
+		} 
+
+		System.out.println("name ctime wtime"); 
+		for (int i = 0; i < p.length; i++) { 
+			System.out.println(" " + p[i] + " " + comp[i] 
+							+ " " + w[i]); 
+
+			res = res + w[i]; 
+			resc = resc + comp[i]; 
+		} 
+
+		System.out.println("Average waiting time is "
+						+ (float)res / p.length); 
+		System.out.println("Average compilation time is "
+						+ (float)resc / p.length); 
+		System.out.println("Sequence is like that " + seq); 
+	} 
+
+	// Driver Code 
+	public static void main(String args[]) 
+	{ 
+		// name of the process 
+		String name[] = { "p1", "p2", "p3", "p4" }; 
+
+		// arrival for every process 
+		int arrivaltime[] = { 0, 1, 2, 3 }; 
+
+		// burst time for every process 
+		int bursttime[] = { 10, 4, 5, 3 }; 
+
+		// quantum time of each process 
+		int q = 3; 
+
+		// cal the function for output 
+		roundRobin(name, arrivaltime, bursttime, q); 
+	} 
+} 
+
+
+
+
+#include<bits/stdc++.h>
+using namespace std;
+#define n 5
+
+void arrangeacctoarrival(int pid[n],int at[n],int bt[n])
+{
+    for(int i=0;i<n;i++)
+    {
+        for(int j=0;j<n-i-1;j++)
+        {
+            if(at[j]>at[j+1])
+            {
+                swap(pid[j],pid[j+1]);
+                swap(at[j],at[j+1]);
+                swap(bt[j],bt[j+1]);
+            }
+        }
+    }
+}
+
+
+void roundrobin(int pid[n],int at[n],int bt[n],int wt[n],int tat[n],int ct[n],int tq)
+{ 
+	int bt1[n]; 
+	for (int i = 0 ; i < n ; i++) 
+		bt1[i] = bt[i]; 
+
+	int t = 0; 
+	while (1) 
+	{ 
+		bool done = true; 
+
+		for (int i = 0 ; i < n; i++) 
+		{ 
+			if (bt1[i] > 0) 
+			{ 
+				done = false; 
+
+				if (bt1[i] > tq) 
+				{ 
+					t += tq; 
+
+					bt1[i] -= tq; 
+				} 
+
+				else
+				{ 
+					t = t + bt1[i]; 
+ 
+					wt[i] = t - bt[i]; 
+
+					bt1[i] = 0; 
+				} 
+			} 
+		} 
+		if (done == true) 
+		break; 
+	} 
+
+  
+     for (int i = 0; i < n ; i++) 
+		tat[i] = bt[i] + wt[i];
+
+
+	// for (int i=0; i<n; i++) 
+	// { 
+	// 	total_wt = total_wt + wt[i]; 
+	// 	total_tat = total_tat + tat[i]; 
+	// 	cout << " " << i+1 << "\t\t" << bt[i] <<"\t "
+	// 		<< wt[i] <<"\t\t " << tat[i] <<endl; 
+	// } 
+
+	// cout << "Average waiting time = "
+	// 	<< (float)total_wt / (float)n; 
+	// cout << "\nAverage turn around time = "
+	// 	<< (float)total_tat / (float)n; 
+}
+
+int main() 
+{ 
+    int pid[n],at[n],bt[n],wt[n],tat[n],ct[n];
+      
+   int tq;
+    cout<<"...Enter the process ID...\n"; 
+    for(int i=0; i<n; i++) 
+    { 
+        cout<<"...Process "<<i+1<<"...\n"; 
+        cout<<"Enter Process Id: "; 
+        cin>>pid[i]; 
+        cout<<"Enter Arrival Time: "; 
+        cin>>at[i]; 
+        cout<<"Enter Burst Time: "; 
+        cin>>bt[i]; 
+        wt[i]=0;
+        tat[i]=0;
+        ct[i]=0;
+    } 
+      cout<<"Enter time quanta:\n";
+      cin>>tq;
+      arrangeacctoarrival(pid,at,bt);
+    cout<<"According to arrival ...\n"; 
+    cout<<"Process ID\tArrival Time\tBurst Time\n"; 
+    for(int i=0; i<n; i++) 
+    {
+        cout<<pid[i]<<"\t\t"<<at[i]<<"\t\t"<<bt[i]<<"\n"; 
+    } 
+    roundrobin(pid,at,bt,wt,tat,ct,tq);
+    cout<<"Final Result...\n"; 
+    cout<<"Process ID\tArrival Time\tBurst Time\tWaiting Time\tTurnaround Time\n"; 
+    for(int i=0; i<n; i++) 
+    { 
+        cout<<pid[i]<<"\t\t"<<at[i]<<"\t\t"<<bt[i]<<"\t\t"<<wt[i]<<"\t\t"<<tat[i]<<"\n"; 
+    } 
+} 
+
+
+
+
+#include<bits/stdc++.h>
+using namespace std;
+#define n 6
+
+void arrangeacctoarrival(int pid[n],int at[n],int bt[n])
+{
+    for(int i=0;i<n;i++)
+    {
+        for(int j=0;j<n-i-1;j++)
+        {
+            if(at[j]>at[j+1])
+            {
+                swap(pid[j],pid[j+1]);
+                swap(at[j],at[j+1]);
+                swap(bt[j],bt[j+1]);
+            }
+        }
+    }
+}
+
+
+void roundrobin(int p[n],int at[n],int bt[n],int w[n],int tat[n],int comp[n],int tq)
+{ 
+		string seq; 
+
+		// copy the burst array and arrival array 
+		// for not effecting the actual array 
+		int bt1[n]; 
+		int at1[n];
+
+		for (int i = 0; i < n; i++) { 
+			bt1[i] = bt[i]; 
+			at1[i] = at[i]; 
+		} 
+
+		int t = 0; 
+
+
+		while (true) { 
+			bool flag = true; 
+			for (int i = 0; i < n; i++) { 
+
+				if (at1[i] <= t) { 
+					if (at1[i] <= tq) { 
+						if (bt1[i] > 0) { 
+							flag = false; 
+							if (bt1[i] > tq) { 
+
+								// make decrease the b time 
+								t = t + tq; 
+								bt1[i] = bt1[i] - tq; 
+								at1[i] = at1[i] + tq; 
+								seq += "->" + to_string(p[i]); 
+							} 
+							else { 
+
+								// for last time 
+								t = t + bt1[i]; 
+
+								// store comp time 
+								comp[i] = t - at[i]; 
+
+								// store wait time 
+								w[i] = t - bt[i] - at[i]; 
+								bt1[i] = 0; 
+
+								// add sequence 
+								seq += "->" + to_string(p[i]); 
+							} 
+						} 
+					} 
+					else if (at1[i] > n) { 
+
+						// is any have less arrival time 
+						// the coming process then execute them 
+						for (int j = 0; j < n; j++) { 
+
+							// compare 
+							if (at1[j] < at1[i]) { 
+								if (bt1[j] > 0) { 
+									flag = false; 
+									if (bt1[j] > tq) { 
+										t = t + tq; 
+										bt1[j] = bt1[j] - tq; 
+										at1[j] = at1[j] + tq; 
+										seq += "->" + to_string(p[j]); 
+									} 
+									else { 
+										t = t + bt1[j]; 
+										comp[j] = t - at[j]; 
+										w[j] = t - bt[j] - at[j]; 
+										bt1[j] = 0; 
+										seq += "->" + to_string(p[j]); 
+									} 
+								} 
+							} 
+						} 
+
+						
+						if (bt1[i] > 0) { 
+							flag = false; 
+
+							if (bt1[i] > tq) { 
+								t = t + tq; 
+								bt1[i] = bt1[i] - tq; 
+								at1[i] = at1[i] + tq; 
+								seq += "->" + p[i]; 
+							} 
+							else { 
+								t = t + bt1[i]; 
+								comp[i] = t - at[i]; 
+								w[i] = t - bt[i] - at[i]; 
+								bt1[i] = 0; 
+								seq += "->" + to_string(p[i]); 
+							} 
+						} 
+					} 
+				} 
+
+				// if no process is come on thse critical 
+				else if (at1[i] > t) { 
+					t++; 
+					i--; 
+				} 
+			} 
+			// for exit the while loop 
+			if (flag) { 
+				break; 
+			} 
+		} 
+    cout<<seq;
+}
+
+int main() 
+{ 
+    int pid[n],at[n],bt[n],wt[n],tat[n],ct[n];
+      
+   int tq;
+    cout<<"...Enter the process ID...\n"; 
+    for(int i=0; i<n; i++) 
+    { 
+        cout<<"...Process "<<i+1<<"...\n"; 
+        cout<<"Enter Process Id: "; 
+        cin>>pid[i]; 
+        cout<<"Enter Arrival Time: "; 
+        cin>>at[i]; 
+        cout<<"Enter Burst Time: "; 
+        cin>>bt[i]; 
+        wt[i]=0;
+        tat[i]=0;
+        ct[i]=0;
+    } 
+      cout<<"Enter time quanta:\n";
+      cin>>tq;
+      arrangeacctoarrival(pid,at,bt);
+    cout<<"According to arrival ...\n"; 
+    cout<<"Process ID\tArrival Time\tBurst Time\n"; 
+    for(int i=0; i<n; i++) 
+    {
+        cout<<pid[i]<<"\t\t"<<at[i]<<"\t\t"<<bt[i]<<"\n"; 
+    } 
+    roundrobin(pid,at,bt,wt,tat,ct,tq);
+    cout<<"Final Result...\n"; 
+    cout<<"Process ID\tArrival Time\tBurst Time\tWaiting Time\tTurnaround Time\n"; 
+    for(int i=0; i<n; i++) 
+    { 
+        cout<<pid[i]<<"\t\t"<<at[i]<<"\t\t"<<bt[i]<<"\t\t"<<wt[i]<<"\t\t"<<tat[i]<<"\n"; 
+    } 
+} 
+

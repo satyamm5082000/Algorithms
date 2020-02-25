@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
-#define n 5
+#define n 6
 
 void arrangeacctoarrival(int pid[n],int at[n],int bt[n])
 {
@@ -39,20 +39,26 @@ void roundrobin(int pid[n],int at[n],int bt[n],int wt[n],int tat[n],int ct[n],in
 				if (bt1[i] > tq) 
 				{ 
 					t += tq; 
-
+                    
 					bt1[i] -= tq; 
 				} 
 
 				else
 				{ 
-                    ct[i]=t;
+
 					t = t + bt1[i]; 
-					
-                    wt[i] = t - bt[i]; 
-                     
+                     ct[i]=t;
+
+					wt[i] = t - bt[i]; 
+
 					bt1[i] = 0; 
+
+                    cout<<pid[i]<<" ";
 				} 
+                
 			} 
+			
+
 		} 
 		if (done == true) 
 		break; 
@@ -113,3 +119,5 @@ int main()
         cout<<pid[i]<<"\t\t"<<at[i]<<"\t\t"<<bt[i]<<"\t\t"<<wt[i]<<"\t\t"<<tat[i]<<"\t\t"<<ct[i]<<"\n"; 
     } 
 } 
+
+
