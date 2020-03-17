@@ -10,6 +10,7 @@ struct process{
                 int TAT;
                 int WT;
                 bool visited;
+                int priority;
                 };
 
 bool cmp(struct process a, struct process b)
@@ -29,36 +30,44 @@ void schedule(process p[], int n)
 
     int time = p[0].AT;
     int done = 0;
-    int i=0;
 
     cout<<"GANTT CHART : - \n\n|| ";
 
-     while(done != n)
+    while(done != n)
     {
-
-        if(p[i+1].AT >= time+p[i].BT)
+        int hp = 0;
+        int hpindex = -1;
+        for(int i=0; i<n; i++)
         {
-            time++;
+            if(p[i].AT <= time && !p[i].visited && p[i].priority > hp)
+            {
+                hp = p[i].priority;
+                hpindex = i;
+            }
+        }
+        if(hpindex != -1)
+        {
+            time = time + p[hpindex].BT;
+            cout<<"P"<<p[hpindex].id<<" || ";
+            p[hpindex].CT = time;
+            p[hpindex].TAT = p[hpindex].CT - p[hpindex].AT;
+            p[hpindex].WT = p[hpindex].TAT - p[hpindex].BT;
+            done++;
+            p[hpindex].visited = true;
         }
         else
         {
-            time += p[i].BT;
-            cout<<"P"<<p[i].id<<" || ";
-
-            p[i].CT = time;
-            p[i].TAT = p[i].CT - p[i].AT;
-            p[i].WT = p[i].TAT - p[i].BT;
-            done++;
-            i++;
+            time++;
         }
 
     }
+
      //Display:-
     cout<<"\n\nAfter scheduling : -\n\n";
-    cout<<"Id     "<<"AT     "<<"BT     "<<" CT     "<<"TAT    "<<"WT     "<<endl;
+    cout<<"Id     "<<"AT     "<<"BT     "<<"Priority"<<" CT     "<<"TAT    "<<"WT     "<<endl;
     for(int i=0; i<n; i++)
     {
-        cout<<p[i].id<<"      "<<p[i].AT<<"      "<<p[i].BT<<"       "<<p[i].CT<<"      "<<p[i].TAT<<"      "<<p[i].WT<<endl;
+        cout<<p[i].id<<"      "<<p[i].AT<<"      "<<p[i].BT<<"       "<<p[i].priority<<"       "<<p[i].CT<<"      "<<p[i].TAT<<"      "<<p[i].WT<<endl;
     }
 
     //average TAT
@@ -89,6 +98,7 @@ int main()
     cout<<"Enter number of processes you want : ";
     int n;
     cin>>n;
+    cout<<"Enter details of each process :-\n";
     process p[n] = {};
 
     for(int i=0;i<n;i++)
@@ -100,19 +110,21 @@ int main()
         cin>>p[i].AT;
         cout<<"Burst time :  ";
         cin>>p[i].BT;
+        cout<<"Priority :  ";
+        cin>>p[i].priority;
         p[i].visited = false;
+
     }
     //Display before scheduling
     cout<<"\nBefore Scheduling : - \n\n";
-    cout<<"Id     "<<"AT     "<<"BT     "<<endl;
+    cout<<"Id     "<<"AT     "<<"BT     "<<"Priority"<<endl;
     for(int i=0; i<n; i++)
     {
-        cout<<p[i].id<<"      "<<p[i].AT<<"      "<<p[i].BT<<endl;
+        cout<<p[i].id<<"      "<<p[i].AT<<"      "<<p[i].BT<<"      "<<p[i].priority<<endl;
     }
 
     schedule(p, n);
 
 
 }
-
 

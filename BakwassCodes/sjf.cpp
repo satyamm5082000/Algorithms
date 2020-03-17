@@ -1,189 +1,125 @@
 #include<bits/stdc++.h>
+
 using namespace std;
 
-class process
+struct process{
+                int id;
+                int AT;
+                int BT;
+                int CT;
+                int TAT;
+                int WT;
+                bool visited;
+                };
+
+bool cmp(struct process a, struct process b)
 {
-   int pid , art , bt , cmpt , tat , wt;
+    int r1 = a.AT;
+    int r2 = b.AT;
 
-   public:
-   void setpid(int pid)
-   {
-      this->pid = pid;
-   }
-   void setart(int art)
-   {
-      this->art = art;
-   }
-   void setbt(int bt)
-   {
-      this->bt = bt;
-   }
-   void setcmpt(int cmpt)
-   {
-      this->cmpt = cmpt;
-   }
-   void settat(int tat)
-   {
-      this->tat = tat;
-   }
-   void setwt(int wt)
-   {
-      this->wt = wt;
-   }
-
-
-   int getpid()
-   {
-      return pid;
-   }
-   int getart()
-   {
-      return art;
-   }
-   int getbt()
-   {
-      return bt;
-   }
-   int getcmpt()
-   {
-      return cmpt;
-   }
-   int gettat()
-   {
-      return tat;
-   }
-   int getwt()
-   {
-      return wt;
-   }
-
-};
-
-bool compareArt(process a , process b)
-{
-   return a.getart() < b.getart();
+    if(r1 == r2)
+        return a.id < b.id;
+    else
+        return r1 < r2;
 }
 
-bool comparePid(process a , process b)
+void schedule(process p[], int n)
 {
-   return a.getpid() < b.getpid();
-}
+    sort(p, p+n, cmp);
 
+    int time = p[0].AT;
+    int done = 0;
 
-void swapproc(process &a , process &b)
-{
-   int temp = a.getpid();
-   a.setpid(b.getpid());
-   b.setpid(temp);
+    cout<<"GANTT CHART : - \n\n|| ";
 
-   temp = a.getart();
-   a.setart(b.getart());
-   b.setart(temp);
-
-   temp = a.getbt();
-   a.setbt(b.getbt());
-   b.setbt(temp);
-
-   temp = a.getcmpt();
-   a.setcmpt(b.getcmpt());
-   b.setcmpt(temp);
-
-}
-
-void sjf(process proc[] , int n)
-{
-
-   sort(proc , proc +n , compareArt);
-
-   int cmt = proc[0].getart() + proc[0].getbt();
-   proc[0].setcmpt(cmt);
-   for(int x=1; x<n; x++)
-   {
-      int minBt = INT_MAX;
-      int minBtInd = -1;
-      for(int i=x ; (i<n) && (proc[i].getart() < cmt) ; i++)
-      {
-         if(minBt > proc[i].getbt())
-         {
-            minBtInd = i;
-            minBt = proc[i].getbt();
-         }
-         else if(minBt == proc[i].getbt())
-         {
-            if(proc[i].getart() < proc[minBtInd].getart())
+     while(done != n)
+    {
+        int minbt = INT_MAX;
+        int minbtindex = -1;
+        for(int i=0; i<n; i++)
+        {
+            if(p[i].AT <= time && !p[i].visited && p[i].BT < minbt)
             {
-               minBtInd = i;
-               minBt = proc[i].getbt();
+                minbt = p[i].BT;
+                minbtindex = i;
             }
-            else if(proc[i].getart() == proc[minBtInd].getart())
-            {
-               if(proc[i].getpid() < proc[minBtInd].getpid())
-               {
-                  minBtInd = i;
-                  minBt = proc[i].getbt();
-               }
-            }
-         }
-      }
+        }
+        if(minbtindex != -1)
+        {
+            time += p[minbtindex].BT;
+            cout<<"P"<<p[minbtindex].id<<" || ";
 
-      swapproc(proc[x] , proc[minBtInd]);
+            p[minbtindex].CT = time;
+            p[minbtindex].TAT = p[minbtindex].CT - p[minbtindex].AT;
+            p[minbtindex].WT = p[minbtindex].TAT - p[minbtindex].BT;
+            done++;
+            p[minbtindex].visited = true;
+        }
+        else
+        {
+            time++;
+        }
 
-      cmt += proc[x].getbt();
-      proc[x].setcmpt(cmt);
-   }
+    }
+     //Display:-
+    cout<<"\n\nAfter scheduling : -\n\n";
+    cout<<"Id     "<<"AT     "<<"BT     "<<" CT     "<<"TAT    "<<"WT     "<<endl;
+    for(int i=0; i<n; i++)
+    {
+        cout<<p[i].id<<"      "<<p[i].AT<<"      "<<p[i].BT<<"       "<<p[i].CT<<"      "<<p[i].TAT<<"      "<<p[i].WT<<endl;
+    }
 
-   cout<<"SEQUENCE: "<<endl;
-   for(int i=0; i<n; i++)
-   {
-      cout<<proc[i].getpid()<<"  ||  ";
-   }
-   cout<<endl;
+    //average TAT
+    double avgtat = 0;
+    for(int i=0; i<n;i++)
+    {
+        avgtat = avgtat + p[i].TAT;
+    }
 
-   sort(proc , proc+n , comparePid);
-   float avgtat=0 , avgwt=0;
-   for(int i=0; i<n; i++)
-   {
-      proc[i].settat(proc[i].getcmpt() - proc[i].getart());
-      proc[i].setwt(proc[i].gettat() - proc[i].getbt());
+    avgtat = (double) avgtat/n;
 
-      avgtat += proc[i].gettat();
-      avgwt += proc[i].getwt();
-   }
+    //average WT
+    double avgWT = 0;
+    for(int i=0; i<n; i++)
+    {
+        avgWT = avgWT + p[i].WT;
+    }
+    avgWT = (double) avgWT/n;
 
-   avgtat /= (float)n;
-   avgwt /= (float)n;
+    cout<<"\nAverage TAT is "<<avgtat<<endl;
+    cout<<"\nAverage WT is "<<avgWT<<endl;
 
-   cout<<"PID    AT    BT    CT    TAT    WT"<<endl;
-   for(int i=0; i<n; i++)
-   {
-      cout<<" "<<proc[i].getpid()<<"     "<<proc[i].getart()<<"     "<<proc[i].getbt()<<"     "<<proc[i].getcmpt()<<"     "<<proc[i].gettat()<<"     "<<proc[i].getwt()<<endl;
-   }
-
-   cout<<"Averge Turn Around Time: "<<avgtat<<endl;
-   cout<<"Averge Waiting Time: "<<avgwt<<endl;
 }
+
 
 int main()
 {
-   int n;
-   cout<<"Enter Number of Process: ";
-   cin>>n;
-   process proc[n];
-   int temp;
-   for(int i=0; i<n; i++)
-   {
-      cout<<"For Process "<<i+1<<" Enter "<<endl;
-      cout<<"Process ID: ";
-      cin>>temp;
-      proc[i].setpid(temp);
-      cout<<"Arrival Time: ";
-      cin>>temp;
-      proc[i].setart(temp);
-      cout<<"Burst Time: ";
-      cin>>temp;
-      proc[i].setbt(temp);
-   }
+    cout<<"Enter number of processes you want : ";
+    int n;
+    cin>>n;
+    process p[n] = {};
 
-   sjf(proc , n);
-   return 0;
+    for(int i=0;i<n;i++)
+    {
+        cout<<"\nEnter Process "<<i+1<<" details : - \n";
+        cout<<"Process Id :  ";
+        cin>>p[i].id;
+        cout<<"Arrival time :  ";
+        cin>>p[i].AT;
+        cout<<"Burst time :  ";
+        cin>>p[i].BT;
+        p[i].visited = false;
+    }
+    //Display before scheduling
+    cout<<"\nBefore Scheduling : - \n\n";
+    cout<<"Id     "<<"AT     "<<"BT     "<<endl;
+    for(int i=0; i<n; i++)
+    {
+        cout<<p[i].id<<"      "<<p[i].AT<<"      "<<p[i].BT<<endl;
+    }
+
+    schedule(p, n);
+
+
 }
+

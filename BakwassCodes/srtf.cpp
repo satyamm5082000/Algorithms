@@ -1,67 +1,130 @@
-#include<iostream>
+#include<bits/stdc++.h>
 
 using namespace std;
-int main()
+
+struct process{
+                int id;
+                int AT;
+                int BT, RBT;
+                int CT;
+                int TAT;
+                int WT;
+                bool visited;
+                int priority;
+                };
+
+bool cmp(struct process a, struct process b)
 {
-    int n;
-    cout<<"Enter the number of Processes: ";  
-    cin>>n;
+    int r1 = a.AT;
+    int r2 = b.AT;
 
-    int a[n],b[n+1],x[n];
-    int waiting[n],turnaround[n],completion[n];
-    int i,j,smallest,count=0,time;
-    double avg=0,tt=0,end;
+    if(r1 == r2)
+        return a.id < b.id;
+    else
+        return r1 < r2;
+}
 
-    
-    for(i=0; i<n; i++)
+void schedule(process p[], int n)
+{
+    sort(p, p+n, cmp);
+
+    int time = p[0].AT;
+    int done = 0;
+
+    cout<<"GANTT CHART : - \n\n|| ";
+
+    while(done != n)
     {
-        cout<<"For Process P"<<(i+1)<<": "<<endl;
-        cout<<"Enter arrival time: ";
-        cin>>a[i];
-        cout<<"Enter burst time: ";
-        cin>>b[i];
-    }
-    for(i=0; i<n; i++)
-        x[i]=b[i];
-
-    b[n]=INT_MAX;
-    for(time=0; count!=n; time++)
-    {
-        smallest=n;
-        for(i=0; i<n; i++)
+        int minbt = INT_MAX;
+        int minbtindex = -1;
+        for(int i=0; i<n; i++)
         {
-            if(a[i]<=time)
+            if(p[i].AT <= time && !p[i].visited && p[i].BT < minbt)
             {
-                if(b[i]<b[smallest] && b[i]>0)
-                {
-                    smallest = i;
-                }
-                else if (b[i] == b[smallest] && b[i]>0)
-                {
-                    if(a[i] < a[smallest])
-                        smallest = i;
-                }
-                
+                minbt = p[i].BT;
+                minbtindex = i;
             }
         }
-        b[smallest]--;
-
-        if(b[smallest]==0)
+        if(minbtindex != -1)
         {
-            count++;
-            end=time+1;
-            completion[smallest] = end;
-            turnaround[smallest] = end - a[smallest];
-            waiting[smallest] = turnaround[smallest] - x[smallest];
+            p[minbtindex].RBT = p[minbtindex].RBT - 1;
+            time++;
+            cout<<"P"<<p[minbtindex].id<<" || ";
+            if( p[minbtindex].RBT == 0 )
+            {
+                p[minbtindex].CT = time;
+                p[minbtindex].TAT = p[minbtindex].CT - p[minbtindex].AT;
+                p[minbtindex].WT = p[minbtindex].TAT - p[minbtindex].BT;
+                done++;
+                p[minbtindex].visited = true;
+            }
         }
+        else
+        {
+            time++;
+        }
+
     }
-    cout<<"Process"<<"\t"<< "burst-time"<<"\t"<<"arrival-time" <<"\t"<<"waiting-time" <<"\t"<<"turnaround-time"<< "\t"<<"completion-time"<<endl;
-    for(i=0; i<n; i++)
+
+     //Display:-
+    cout<<"\n\nAfter scheduling : -\n\n";
+    cout<<"Id     "<<"AT     "<<"BT     "<<" CT     "<<"TAT    "<<"WT     "<<endl;
+    for(int i=0; i<n; i++)
     {
-        cout<<"p"<<i+1<<"\t\t"<<x[i]<<"\t\t"<<a[i]<<"\t\t"<<waiting[i]<<"\t\t"<<turnaround[i]<<"\t\t"<<completion[i]<<endl;
-        avg += waiting[i];
-        tt += turnaround[i];
+        cout<<p[i].id<<"      "<<p[i].AT<<"      "<<p[i].BT<<"       "<<p[i].CT<<"      "<<p[i].TAT<<"      "<<p[i].WT<<endl;
     }
-    cout<<"\n\nAverage waiting time ="<<(float)avg/n;
-    cout<<"  Average Turnaround time ="<<(float)tt/n<<endl;
+
+    //average TAT
+    double avgtat = 0;
+    for(int i=0; i<n;i++)
+    {
+        avgtat = avgtat + p[i].TAT;
+    }
+
+    avgtat = (double) avgtat/n;
+
+    //average WT
+    double avgWT = 0;
+    for(int i=0; i<n; i++)
+    {
+        avgWT = avgWT + p[i].WT;
+    }
+    avgWT = (double) avgWT/n;
+
+    cout<<"\nAverage TAT is "<<avgtat<<endl;
+    cout<<"\nAverage WT is "<<avgWT<<endl;
+
+}
+
+
+int main()
+{
+    cout<<"Enter number of processes you want : ";
+    int n;
+    cin>>n;
+    process p[n] = {};
+
+    for(int i=0;i<n;i++)
+    {
+        cout<<"\nEnter Process "<<i+1<<" details : - \n";
+        cout<<"Process Id :  ";
+        cin>>p[i].id;
+        cout<<"Arrival time :  ";
+        cin>>p[i].AT;
+        cout<<"Burst time :  ";
+        cin>>p[i].BT;
+        p[i].visited = false;
+        p[i].RBT = p[i].BT;
+    }
+    //Display before scheduling
+    cout<<"\nBefore Scheduling : - \n\n";
+    cout<<"Id     "<<"AT     "<<"BT     "<<endl;
+    for(int i=0; i<n; i++)
+    {
+        cout<<p[i].id<<"      "<<p[i].AT<<"      "<<p[i].BT<<endl;
+    }
+
+    schedule(p, n);
+
+
 }
