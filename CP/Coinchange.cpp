@@ -27,11 +27,11 @@ int main()
   int coins[n];
   for(int i=0;i<n;i++)
   {
-      cin>>coins[i];
+      cin>>coins[i];          
   }
   int noofways=Coinchange(n,amount,coins);
 
 
-    cout<<noofways;
+  cout<<noofways;
 
 }
