@@ -1,6 +1,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+/*
+Implemented Queue
+using Array and all
+it function take O(1)
+*/
+
 template <typename T>
 class QueueUsingArray {
 	T* data;
@@ -44,24 +50,12 @@ public:
 				newData[ff] = data[i];
 				ff++;
 			}
-			/*
-			for (int i = f; i < r; i = (i + 1) % cap)
-			{
-				cout << data[i] << " ";
-				newData[ff] = data[i];
-				ff++;
-			}
-
-			cout << endl;*/
 
 			delete []data;
 			data = newData;
 			cap = cap * 2;
 			f = 0;
 			r = cap;
-
-			// cout << "Queue is Full!!" << endl;
-			// return;
 		}
 
 		data[r] = d;
@@ -98,6 +92,89 @@ public:
 		s--;
 	}
 };
+
+/*
+Implemented Queue
+using LinkList and all
+it function take O(1)
+*/
+template <typename T>
+class Node {
+
+public:
+	T data;
+	Node<T> *next;
+
+	Node(int d)
+	{
+		data = d;
+		next = NULL;
+	}
+};
+
+template <typename T>
+class QueueUsingLL {
+
+	Node<T> *head, *tail;
+	int s = 0;
+
+public:
+
+	QueueUsingLL() {
+		head = NULL;
+		tail = NULL;
+		s = 0;
+	}
+
+	int size () {
+		return s;
+	}
+
+	bool isEmpty () {
+		return s == 0;
+	}
+
+	void enqueue (T d) {
+		Node<T>* newNode = new Node<T>(d);
+
+		if (head == NULL)
+		{
+			head = newNode;
+			tail = newNode;
+		}
+		else
+		{
+			tail->next = newNode;
+			tail = newNode;
+		}
+
+		s++;
+	}
+
+	T front () {
+		if (s == 0) {
+			cout << "Queue is Empty!!" << endl;
+			return 0;
+		}
+		return head->data;
+	}
+
+	T dequeue () {
+		if (s == 0) {
+			cout << "Queue is Empty!!" << endl;
+			return 0;
+		}
+
+		Node<T>* free = head;
+		head = NULL;
+		delete head;
+		head = free->next;
+
+		return free->data;
+		s--;
+	}
+
+};
 int main ()
 {
 #ifndef ONLINE_JUDGE
@@ -106,7 +183,7 @@ int main ()
 	//for writing output to output.txt
 	freopen ("output.txt", "w", stdout);
 #endif
-	QueueUsingArray<int> q(5);
+	QueueUsingLL<int> q;
 	q.enqueue(10);
 	q.enqueue(20);
 	q.enqueue(30);
