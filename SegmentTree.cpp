@@ -1,37 +1,95 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 
-void buildsegmenttreee(int ar[],int STree[],int s,int e,int l)
+void build(int* ar, int* segemenTree, int start, int end, int treeNode)
 {
-   
+	if (start == end)
+	{
+		segemenTree[treeNode] = ar[end];
+		return;
+	}
+	int mid = (start + end) / 2;
+	build(ar, segemenTree, start, mid, 2 * treeNode);
+	build(ar, segemenTree, mid + 1, end, 2 * treeNode + 1);
 
-    if(s==e){
-    STree[l]=ar[s];
-    return;
-    }
-    int mid=(s+e)/2;
+	segemenTree[treeNode] = segemenTree[2 * treeNode] + segemenTree[2 * treeNode + 1];
 
-    buildsegmenttreee(ar,STree,s,mid,2*l);
-    buildsegmenttreee(ar,STree,mid+1,e,2*l+1);
-    
-        STree[l]=STree[2*l]+STree[2*l+1];
-            // cout<<2*l<<" "<<2*l+1<<" "<<STree[2*l]<<" "<<STree[2*l+1]<<" "<<STree[l]<<"\n";
+	return;
+}
 
+void update(int* ar, int* segemenTree, int start, int end, int treeNode, int idx, int value)
+{
+	if (start == end)
+	{
+		ar[idx] = value;
+		segemenTree[treeNode] = value;
+		return;
+	}
+	int mid = (start + end) / 2;
 
+	if (idx <= mid)
+	{
+		update(ar, segemenTree, start, mid, 2 * treeNode, idx, value);
+	}
+	else
+	{
+		update(ar, segemenTree, mid + 1, end, 2 * treeNode + 1, idx, value);
+	}
+
+	segemenTree[treeNode] = segemenTree[2 * treeNode] + segemenTree[2 * treeNode + 1];
+
+	return;
+}
+
+int range(int* ar, int* segemenTree, int start, int end, int treeNode, int l, int r)
+{
+	if (r < start || l > end)
+		return 0;
+
+	if (start >= l && end <= r)//error point
+		return segemenTree[treeNode];
+
+	int mid = (start + end) / 2;
+
+	int ans1 = range(ar, segemenTree, start, mid, 2 * treeNode, l, r);
+	int ans2 = range(ar, segemenTree, mid + 1, end, 2 * treeNode + 1, l, r);
+
+	return (ans1 + ans2);
 }
 
 
 int main()
 {
-    int ar[12]={1,2,3,4,5,6,7,8,9,10,11,12};
+#ifndef ONLINE_JUDGE
+	//for getting input from input.txt
+	freopen ("input.txt", "r", stdin);
+	//for writing output to output.txt
+	freopen ("output.txt", "w", stdout);
+#endif
 
-    int STree[24];
+	int n;
+	cin >> n;
 
-    buildsegmenttreee(ar,STree,0,11,1);
+	int ar[n];
+	for (int i = 0; i < n; i++)
+	{
+		cin >> ar[i];
+	}
 
-    for(int i=1;i<24;i++)
-    {
-        cout<<STree[i]<<" ";
-    }
-    //cout<<STree[12]<<" "<<STree[13]<<" "<<STree[14]<<" "<<STree[15]<<STree[18]<<" "<<STree[19];
+	int segemenTree[4 * n];
+	memset(segemenTree, -1, sizeof(segemenTree));
+	build(ar, segemenTree, 0, n - 1, 1);
+	for (int i = 0; i < 4 * n; i++)
+	{
+		cout << segemenTree[i] << " ";
+	}
+	cout << endl;
+	update(ar, segemenTree, 0, n - 1, 1, 2, 10);
+	for (int i = 0; i < 4 * n; i++)
+	{
+		cout << segemenTree[i] << " ";
+	}
+	cout << endl;
+	int ans = range(ar, segemenTree, 0, n - 1, 1, 1, 4);
+	cout << ans << endl;
 }
